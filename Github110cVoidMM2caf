@@ -1,0 +1,765 @@
+if _G.Github110cVoidMM2caf then return end
+_G.Github110cVoidMM2caf = true
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local TextService = game:GetService("TextService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local Q_ACCENT = Color3.fromRGB(200, 0, 0)
+local Q_ACCENT_DK = Color3.fromRGB(120, 30, 30)
+local Q_BG_DARK = Color3.fromRGB(10, 8, 8)
+local Q_BG_MID = Color3.fromRGB(20, 14, 14)
+
+local promptGui = Instance.new("ScreenGui")
+promptGui.Name = "110cEliteQusetion"
+promptGui.ResetOnSpawn = false
+promptGui.DisplayOrder = 999
+promptGui.IgnoreGuiInset = true
+local ok1 = pcall(function() promptGui.Parent = CoreGui end)
+if not ok1 then promptGui.Parent = playerGui end
+
+local promptFrame = Instance.new("Frame")
+promptFrame.Size = UDim2.new(0.35, 0, 0.35, 0)
+promptFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+promptFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+promptFrame.BackgroundColor3 = Q_BG_DARK
+promptFrame.BorderSizePixel = 0
+promptFrame.Active = true
+promptFrame.Parent = promptGui
+
+local qc = Instance.new("UICorner"); qc.CornerRadius = UDim.new(0, 10); qc.Parent = promptFrame
+local qs = Instance.new("UIStroke")
+qs.Color = Q_ACCENT; qs.Thickness = 1; qs.Transparency = 0.35; qs.Parent = promptFrame
+
+local qGlow = Instance.new("Frame")
+qGlow.Size = UDim2.new(1, 8, 1, 8)
+qGlow.Position = UDim2.new(0, -4, 0, -4)
+qGlow.BackgroundColor3 = Q_ACCENT
+qGlow.BackgroundTransparency = 0.9
+qGlow.BorderSizePixel = 0
+qGlow.ZIndex = 0
+qGlow.Parent = promptFrame
+local qGc = Instance.new("UICorner"); qGc.CornerRadius = UDim.new(0, 12); qGc.Parent = qGlow
+
+local qGrad = Instance.new("UIGradient")
+qGrad.Rotation = 90
+qGrad.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Q_BG_MID),
+    ColorSequenceKeypoint.new(1, Q_BG_DARK),
+})
+qGrad.Parent = promptFrame
+
+local qTitleBar = Instance.new("Frame")
+qTitleBar.Size = UDim2.new(1, 0, 0, 26)
+qTitleBar.BackgroundTransparency = 1
+qTitleBar.Active = true
+qTitleBar.ZIndex = 2
+qTitleBar.Parent = promptFrame
+
+local qTitleClip = Instance.new("Frame")
+qTitleClip.Size = UDim2.new(1, -16, 1, 0)
+qTitleClip.Position = UDim2.new(0, 8, 0, 0)
+qTitleClip.BackgroundTransparency = 1
+qTitleClip.ClipsDescendants = true
+qTitleClip.Active = false
+qTitleClip.ZIndex = 3
+qTitleClip.Parent = qTitleBar
+
+local BRAND_TEXT = "Github.com/110c"
+local BRAND_SIZE = 12
+local brandWidth = TextService:GetTextSize(BRAND_TEXT, BRAND_SIZE, Enum.Font.GothamBold, Vector2.new(10000, 100)).X + 4
+
+local qBrand = Instance.new("TextLabel")
+qBrand.Size = UDim2.fromOffset(brandWidth, 26)
+qBrand.Position = UDim2.fromOffset(0, 0)
+qBrand.BackgroundTransparency = 1
+qBrand.Text = BRAND_TEXT
+qBrand.TextColor3 = Color3.new(1, 1, 1)
+qBrand.TextStrokeColor3 = Q_ACCENT
+qBrand.TextStrokeTransparency = 0
+qBrand.Font = Enum.Font.GothamBold
+qBrand.TextSize = BRAND_SIZE
+qBrand.TextXAlignment = Enum.TextXAlignment.Left
+qBrand.Active = false
+qBrand.ZIndex = 4
+qBrand.Parent = qTitleClip
+
+local qContent = Instance.new("Frame")
+qContent.Size = UDim2.new(1, 0, 1, -26)
+qContent.Position = UDim2.new(0, 0, 0, 26)
+qContent.BackgroundTransparency = 1
+qContent.ZIndex = 2
+qContent.Parent = promptFrame
+
+local viewport = Workspace.CurrentCamera.ViewportSize
+local promptMinDim = math.min(viewport.X * 0.35, viewport.Y * 0.35)
+
+local question = Instance.new("TextLabel")
+question.Size = UDim2.new(1, -20, 0.48, 0)
+question.Position = UDim2.new(0, 10, 0.03, 0)
+question.BackgroundTransparency = 1
+question.RichText = true
+question.Text = 'Do you have the <font color="#FF0000">[ELITE]</font> Gamepass on this account?'
+question.TextColor3 = Color3.new(1, 1, 1)
+question.Font = Enum.Font.GothamBold
+question.TextSize = math.floor(promptMinDim * 0.07)
+question.TextWrapped = true
+question.TextYAlignment = Enum.TextYAlignment.Center
+question.ZIndex = 3
+question.Parent = qContent
+
+local warning = Instance.new("TextLabel")
+warning.Size = UDim2.new(1, -20, 0.14, 0)
+warning.Position = UDim2.new(0, 10, 0.53, 0)
+warning.BackgroundTransparency = 1
+warning.Text = "(Selecting the wrong option will lead to inefficiency when auto farming)"
+warning.TextColor3 = Color3.fromRGB(180, 180, 180)
+warning.Font = Enum.Font.Gotham
+warning.TextSize = math.floor(promptMinDim * 0.035)
+warning.TextWrapped = true
+warning.TextYAlignment = Enum.TextYAlignment.Center
+warning.ZIndex = 3
+warning.Parent = qContent
+
+local qButtonRow = Instance.new("Frame")
+qButtonRow.Size = UDim2.new(1, -20, 0.20, 0)
+qButtonRow.Position = UDim2.new(0, 10, 0.72, 0)
+qButtonRow.BackgroundTransparency = 1
+qButtonRow.ZIndex = 3
+qButtonRow.Parent = qContent
+
+local yesBtn = Instance.new("TextButton")
+yesBtn.Size = UDim2.new(0.48, 0, 1, 0)
+yesBtn.Position = UDim2.new(0, 0, 0, 0)
+yesBtn.BackgroundColor3 = Q_BG_MID
+yesBtn.Text = "Yes!"
+yesBtn.TextColor3 = Color3.new(1, 1, 1)
+yesBtn.TextStrokeColor3 = Q_ACCENT
+yesBtn.TextStrokeTransparency = 0
+yesBtn.Font = Enum.Font.GothamBold
+yesBtn.TextSize = math.floor(promptMinDim * 0.05)
+yesBtn.BorderSizePixel = 0
+yesBtn.AutoButtonColor = false
+yesBtn.ZIndex = 4
+yesBtn.Parent = qButtonRow
+local yc = Instance.new("UICorner"); yc.CornerRadius = UDim.new(0, 6); yc.Parent = yesBtn
+local ys = Instance.new("UIStroke")
+ys.Color = Q_ACCENT_DK; ys.Thickness = 1; ys.Transparency = 0.2; ys.Parent = yesBtn
+
+local noBtn = Instance.new("TextButton")
+noBtn.Size = UDim2.new(0.48, 0, 1, 0)
+noBtn.Position = UDim2.new(0.52, 0, 0, 0)
+noBtn.BackgroundColor3 = Q_BG_MID
+noBtn.Text = "No!"
+noBtn.TextColor3 = Color3.new(1, 1, 1)
+noBtn.TextStrokeColor3 = Q_ACCENT
+noBtn.TextStrokeTransparency = 0
+noBtn.Font = Enum.Font.GothamBold
+noBtn.TextSize = math.floor(promptMinDim * 0.05)
+noBtn.BorderSizePixel = 0
+noBtn.AutoButtonColor = false
+noBtn.ZIndex = 4
+noBtn.Parent = qButtonRow
+local nc = Instance.new("UICorner"); nc.CornerRadius = UDim.new(0, 6); nc.Parent = noBtn
+local ns = Instance.new("UIStroke")
+ns.Color = Q_ACCENT_DK; ns.Thickness = 1; ns.Transparency = 0.2; ns.Parent = noBtn
+
+yesBtn.MouseEnter:Connect(function()
+    yesBtn.BackgroundColor3 = Q_BG_MID:Lerp(Q_ACCENT, 0.3)
+    ys.Color = Q_ACCENT; ys.Transparency = 0
+end)
+yesBtn.MouseLeave:Connect(function()
+    yesBtn.BackgroundColor3 = Q_BG_MID
+    ys.Color = Q_ACCENT_DK; ys.Transparency = 0.2
+end)
+noBtn.MouseEnter:Connect(function()
+    noBtn.BackgroundColor3 = Q_BG_MID:Lerp(Q_ACCENT, 0.3)
+    ns.Color = Q_ACCENT; ns.Transparency = 0
+end)
+noBtn.MouseLeave:Connect(function()
+    noBtn.BackgroundColor3 = Q_BG_MID
+    ns.Color = Q_ACCENT_DK; ns.Transparency = 0.2
+end)
+
+local qWatermark = Instance.new("TextLabel")
+qWatermark.Size = UDim2.fromOffset(40, 14)
+qWatermark.Position = UDim2.new(1, -10, 1, -18)
+qWatermark.AnchorPoint = Vector2.new(1, 0)
+qWatermark.BackgroundTransparency = 1
+qWatermark.Text = "1ra"
+qWatermark.TextColor3 = Color3.new(1, 1, 1)
+qWatermark.TextStrokeColor3 = Q_ACCENT
+qWatermark.TextStrokeTransparency = 0
+qWatermark.Font = Enum.Font.GothamBold
+qWatermark.TextSize = 11
+qWatermark.TextXAlignment = Enum.TextXAlignment.Right
+qWatermark.ZIndex = 4
+qWatermark.Parent = promptFrame
+
+task.spawn(function()
+    local BASE_SPEED = 130
+    local marqueeX = 0
+    local initialized = false
+    local currentSpeed = 1
+    local targetSpeed = 1
+    local speedTimer = 0
+    local nextSpeedChange = 0.4 + math.random() * 0.8
+    local conn
+    conn = RunService.RenderStepped:Connect(function(dt)
+        if not promptFrame.Parent then
+            conn:Disconnect()
+            return
+        end
+        speedTimer = speedTimer + dt
+        if speedTimer >= nextSpeedChange then
+            speedTimer = 0
+            nextSpeedChange = 0.35 + math.random() * 1.15
+            targetSpeed = 0.2 + math.random() * 2.3
+        end
+        currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * math.min(1, dt * 4.5)
+
+        local containerW = qTitleClip.AbsoluteSize.X
+        if not initialized and containerW > 20 then
+            marqueeX = containerW
+            initialized = true
+        end
+        if not initialized then return end
+
+        marqueeX = marqueeX - BASE_SPEED * currentSpeed * dt
+        if marqueeX < -brandWidth then marqueeX = containerW end
+        qBrand.Position = UDim2.fromOffset(marqueeX, 0)
+    end)
+end)
+
+local qDragging, qDragStart, qStartPos = false, nil, nil
+qTitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        qDragging = true
+        qDragStart = input.Position
+        qStartPos = promptFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                qDragging = false
+            end
+        end)
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if not qDragging then return end
+    if input.UserInputType == Enum.UserInputType.MouseMovement
+    or input.UserInputType == Enum.UserInputType.Touch then
+        local d = input.Position - qDragStart
+        promptFrame.Position = UDim2.new(
+            qStartPos.X.Scale, qStartPos.X.Offset + d.X,
+            qStartPos.Y.Scale, qStartPos.Y.Offset + d.Y
+        )
+    end
+end)
+
+local choiceMade = false
+local userHasElite = false
+
+yesBtn.MouseButton1Click:Connect(function()
+    if choiceMade then return end
+    choiceMade = true
+    userHasElite = true
+    promptGui:Destroy()
+end)
+noBtn.MouseButton1Click:Connect(function()
+    if choiceMade then return end
+    choiceMade = true
+    userHasElite = false
+    promptGui:Destroy()
+end)
+
+while not choiceMade do
+    task.wait(0.1)
+end
+
+local maxCandies = userHasElite and 50 or 40
+
+local hrp = nil
+local humanoid = nil
+local function updateHRP()
+    if player.Character then
+        hrp = player.Character:FindFirstChild("HumanoidRootPart")
+        humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+    end
+end
+player.CharacterAdded:Connect(function()
+    task.wait(0.5)
+    updateHRP()
+end)
+updateHRP()
+
+local speed = 21.0
+local farmEnabled = false
+local farmLoop = nil
+local collectedCandies = {}
+local currentCandies = 0
+local bagFullProcessing = false
+local resetWhenFullEnabled = true
+
+local candyCollectedRemote = ReplicatedStorage:FindFirstChild("Remotes")
+    and ReplicatedStorage.Remotes:FindFirstChild("Gameplay")
+    and ReplicatedStorage.Remotes.Gameplay:FindFirstChild("CoinCollected")
+local roundStartRemote = ReplicatedStorage:FindFirstChild("Remotes")
+    and ReplicatedStorage.Remotes:FindFirstChild("Gameplay")
+    and ReplicatedStorage.Remotes.Gameplay:FindFirstChild("RoundStart")
+
+local function getMyRole()
+    local remote = ReplicatedStorage:FindFirstChild("GetPlayerData", true)
+    if not remote then return "Default" end
+    local success, data = pcall(remote.InvokeServer, remote)
+    if not success or type(data) ~= "table" then return "Default" end
+    local myData = data[player.Name]
+    if myData and type(myData) == "table" and not myData.Dead then
+        return myData.Role or "Default"
+    end
+    return "Default"
+end
+
+local function onBagFull()
+    if not resetWhenFullEnabled then bagFullProcessing = false; return end
+    bagFullProcessing = true
+    if player.Character then player.Character:BreakJoints() end
+    player.CharacterAdded:Wait()
+    task.wait(1)
+    updateHRP()
+    task.wait(1)
+    bagFullProcessing = false
+end
+
+task.spawn(function()
+    while true do
+        task.wait(0.75)
+        if resetWhenFullEnabled and getMyRole() == "Default" then
+            currentCandies = 0
+        end
+    end
+end)
+
+local function getNearestCandy()
+    if not hrp then return nil end
+    if currentCandies >= maxCandies then return nil end
+
+    local pos = hrp.Position
+    local best, bestDist = nil, 9e9
+
+    for _, map in Workspace:GetChildren() do
+        local folder = map:FindFirstChild("CoinContainer")
+        if folder then
+            for _, obj in folder:GetChildren() do
+                if obj:IsA("BasePart")
+                    and obj:GetAttribute("CoinID") == "Candy"
+                    and obj:FindFirstChild("TouchInterest")
+                    and not collectedCandies[obj]
+                then
+                    local d = (pos - obj.Position).Magnitude
+                    if d < 500 and d < bestDist and d > 3 then
+                        bestDist = d
+                        best = obj
+                    end
+                end
+            end
+        end
+    end
+    return best
+end
+
+local function startFarming()
+    while farmEnabled do
+        if bagFullProcessing or currentCandies >= maxCandies then
+            task.wait(1)
+            continue
+        end
+        if not hrp or not player.Character or (humanoid and humanoid.Health <= 0) then
+            task.wait(0.5)
+            continue
+        end
+        local candy = getNearestCandy()
+        if candy then
+            collectedCandies[candy] = true
+            local candyPos = candy.Position
+            local dist = (hrp.Position - candyPos).Magnitude
+            local goal = CFrame.new(candyPos + Vector3.new(0, 3, 0))
+            local time = math.max(dist / speed, 0.03)
+            local tween = TweenService:Create(hrp, TweenInfo.new(time, Enum.EasingStyle.Linear), {CFrame = goal})
+            tween:Play()
+            local candyStillValid = true
+            while tween.PlaybackState == Enum.PlaybackState.Playing and candyStillValid do
+                if not candy.Parent or not candy:FindFirstChild("TouchInterest") then
+                    candyStillValid = false
+                    tween:Cancel()
+                end
+                task.wait(0.1)
+            end
+        else
+            task.wait(0.2)
+        end
+    end
+end
+
+if candyCollectedRemote then
+    candyCollectedRemote.OnClientEvent:Connect(function(itemType, amount)
+        if itemType == "Candy" then
+            currentCandies = amount
+            if currentCandies >= maxCandies and not bagFullProcessing and resetWhenFullEnabled then
+                bagFullProcessing = true
+                task.spawn(onBagFull)
+            end
+        end
+    end)
+end
+
+if roundStartRemote then
+    roundStartRemote.OnClientEvent:Connect(function()
+        collectedCandies = {}
+        currentCandies = 0
+    end)
+end
+
+local F_ACCENT = Color3.fromRGB(255, 150, 50)
+local F_ACCENT_DK = Color3.fromRGB(140, 75, 20)
+local F_BG_DARK = Color3.fromRGB(16, 11, 6)
+local F_BG_MID = Color3.fromRGB(28, 18, 10)
+
+local MAIN_W, MAIN_H = 280, 175
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "110c_CandyFarm_UI"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+local ok2 = pcall(function() gui.Parent = CoreGui end)
+if not ok2 then gui.Parent = playerGui end
+
+local main = Instance.new("Frame")
+main.Size = UDim2.fromOffset(MAIN_W, MAIN_H)
+main.Position = UDim2.new(0.5, -MAIN_W/2, 0.5, -MAIN_H/2)
+main.BackgroundColor3 = F_BG_DARK
+main.BorderSizePixel = 0
+main.Active = true
+main.Parent = gui
+
+local mc = Instance.new("UICorner"); mc.CornerRadius = UDim.new(0, 10); mc.Parent = main
+local ms = Instance.new("UIStroke")
+ms.Color = F_ACCENT; ms.Thickness = 1; ms.Transparency = 0.35; ms.Parent = main
+
+local glow = Instance.new("Frame")
+glow.Size = UDim2.new(1, 8, 1, 8)
+glow.Position = UDim2.new(0, -4, 0, -4)
+glow.BackgroundColor3 = F_ACCENT
+glow.BackgroundTransparency = 0.9
+glow.BorderSizePixel = 0
+glow.ZIndex = 0
+glow.Parent = main
+local gcn = Instance.new("UICorner"); gcn.CornerRadius = UDim.new(0, 12); gcn.Parent = glow
+
+local mg = Instance.new("UIGradient")
+mg.Rotation = 90
+mg.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, F_BG_MID),
+    ColorSequenceKeypoint.new(1, F_BG_DARK),
+})
+mg.Parent = main
+
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 26)
+titleBar.BackgroundTransparency = 1
+titleBar.Active = true
+titleBar.ZIndex = 2
+titleBar.Parent = main
+
+local titleClip = Instance.new("Frame")
+titleClip.Size = UDim2.new(1, -16, 1, 0)
+titleClip.Position = UDim2.new(0, 8, 0, 0)
+titleClip.BackgroundTransparency = 1
+titleClip.ClipsDescendants = true
+titleClip.Active = false
+titleClip.ZIndex = 3
+titleClip.Parent = titleBar
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.fromOffset(brandWidth, 26)
+titleLabel.Position = UDim2.fromOffset(0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = BRAND_TEXT
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.TextStrokeColor3 = F_ACCENT
+titleLabel.TextStrokeTransparency = 0
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = BRAND_SIZE
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Active = false
+titleLabel.ZIndex = 4
+titleLabel.Parent = titleClip
+
+task.spawn(function()
+    local BASE_SPEED = 130
+    local marqueeX = 0
+    local initialized = false
+    local currentSpeed = 1
+    local targetSpeed = 1
+    local speedTimer = 0
+    local nextSpeedChange = 0.4 + math.random() * 0.8
+    local conn
+    conn = RunService.RenderStepped:Connect(function(dt)
+        if not main.Parent then
+            conn:Disconnect()
+            return
+        end
+        speedTimer = speedTimer + dt
+        if speedTimer >= nextSpeedChange then
+            speedTimer = 0
+            nextSpeedChange = 0.35 + math.random() * 1.15
+            targetSpeed = 0.2 + math.random() * 2.3
+        end
+        currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * math.min(1, dt * 4.5)
+
+        local containerW = titleClip.AbsoluteSize.X
+        if not initialized and containerW > 20 then
+            marqueeX = containerW
+            initialized = true
+        end
+        if not initialized then return end
+
+        marqueeX = marqueeX - BASE_SPEED * currentSpeed * dt
+        if marqueeX < -brandWidth then marqueeX = containerW end
+        titleLabel.Position = UDim2.fromOffset(marqueeX, 0)
+    end)
+end)
+
+local farmToggle = Instance.new("TextButton")
+farmToggle.Size = UDim2.new(1, -28, 0, 28)
+farmToggle.Position = UDim2.fromOffset(14, 32)
+farmToggle.BackgroundColor3 = F_BG_MID
+farmToggle.Text = "FARM: OFF"
+farmToggle.TextColor3 = Color3.new(1, 1, 1)
+farmToggle.TextStrokeColor3 = F_ACCENT
+farmToggle.TextStrokeTransparency = 0
+farmToggle.Font = Enum.Font.GothamBold
+farmToggle.TextSize = 12
+farmToggle.BorderSizePixel = 0
+farmToggle.AutoButtonColor = false
+farmToggle.ZIndex = 4
+farmToggle.Parent = main
+local ftc = Instance.new("UICorner"); ftc.CornerRadius = UDim.new(0, 6); ftc.Parent = farmToggle
+local fts = Instance.new("UIStroke")
+fts.Color = F_ACCENT_DK; fts.Thickness = 1; fts.Transparency = 0.2; fts.Parent = farmToggle
+
+local speedRow = Instance.new("Frame")
+speedRow.Size = UDim2.new(1, -28, 0, 24)
+speedRow.Position = UDim2.fromOffset(14, 66)
+speedRow.BackgroundTransparency = 1
+speedRow.ZIndex = 2
+speedRow.Parent = main
+
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.fromOffset(70, 24)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "SPEED"
+speedLabel.TextColor3 = Color3.new(1, 1, 1)
+speedLabel.TextStrokeColor3 = F_ACCENT
+speedLabel.TextStrokeTransparency = 0
+speedLabel.Font = Enum.Font.GothamBold
+speedLabel.TextSize = 11
+speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+speedLabel.ZIndex = 3
+speedLabel.Parent = speedRow
+
+local speedBox = Instance.new("TextBox")
+speedBox.Size = UDim2.new(1, -75, 0, 24)
+speedBox.Position = UDim2.fromOffset(75, 0)
+speedBox.BackgroundColor3 = F_BG_DARK
+speedBox.Text = "21.0"
+speedBox.TextColor3 = Color3.new(1, 1, 1)
+speedBox.TextStrokeColor3 = F_ACCENT
+speedBox.TextStrokeTransparency = 0
+speedBox.Font = Enum.Font.GothamBold
+speedBox.TextSize = 13
+speedBox.TextXAlignment = Enum.TextXAlignment.Center
+speedBox.ClearTextOnFocus = false
+speedBox.ZIndex = 4
+speedBox.Parent = speedRow
+local sbc = Instance.new("UICorner"); sbc.CornerRadius = UDim.new(0, 5); sbc.Parent = speedBox
+local sbs = Instance.new("UIStroke")
+sbs.Color = F_ACCENT_DK; sbs.Thickness = 1; sbs.Transparency = 0.2; sbs.Parent = speedBox
+
+local resetCard = Instance.new("TextButton")
+resetCard.Size = UDim2.new(1, -28, 0, 40)
+resetCard.Position = UDim2.fromOffset(14, 96)
+resetCard.BackgroundColor3 = F_BG_MID
+resetCard.Text = ""
+resetCard.BorderSizePixel = 0
+resetCard.AutoButtonColor = false
+resetCard.ZIndex = 2
+resetCard.Parent = main
+local rcn = Instance.new("UICorner"); rcn.CornerRadius = UDim.new(0, 8); rcn.Parent = resetCard
+local rs = Instance.new("UIStroke")
+rs.Color = F_ACCENT_DK; rs.Thickness = 1; rs.Transparency = 0.2; rs.Parent = resetCard
+
+local resetLabel = Instance.new("TextLabel")
+resetLabel.Size = UDim2.new(1, -50, 1, 0)
+resetLabel.Position = UDim2.new(0, 10, 0, 0)
+resetLabel.BackgroundTransparency = 1
+resetLabel.Text = "RESET WHEN FULL"
+resetLabel.TextColor3 = Color3.new(1, 1, 1)
+resetLabel.TextStrokeColor3 = F_ACCENT
+resetLabel.TextStrokeTransparency = 0
+resetLabel.Font = Enum.Font.GothamBold
+resetLabel.TextSize = 10
+resetLabel.TextXAlignment = Enum.TextXAlignment.Left
+resetLabel.ZIndex = 4
+resetLabel.Parent = resetCard
+
+local resetIndicator = Instance.new("Frame")
+resetIndicator.Size = UDim2.fromOffset(10, 10)
+resetIndicator.Position = UDim2.new(1, -22, 0.5, -5)
+resetIndicator.BackgroundColor3 = F_ACCENT
+resetIndicator.BorderSizePixel = 0
+resetIndicator.ZIndex = 3
+resetIndicator.Parent = resetCard
+local ric = Instance.new("UICorner"); ric.CornerRadius = UDim.new(1, 0); ric.Parent = resetIndicator
+
+local statusDot = Instance.new("Frame")
+statusDot.Size = UDim2.fromOffset(6, 6)
+statusDot.Position = UDim2.new(0, 14, 1, -18)
+statusDot.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
+statusDot.BorderSizePixel = 0
+statusDot.ZIndex = 3
+statusDot.Parent = main
+local sdc = Instance.new("UICorner"); sdc.CornerRadius = UDim.new(1, 0); sdc.Parent = statusDot
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(0.65, 0, 0, 14)
+statusLabel.Position = UDim2.new(0, 26, 1, -22)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Farm: OFF | Speed: 21.0"
+statusLabel.TextColor3 = Color3.new(1, 1, 1)
+statusLabel.TextStrokeColor3 = F_ACCENT
+statusLabel.TextStrokeTransparency = 0
+statusLabel.Font = Enum.Font.GothamBold
+statusLabel.TextSize = 10
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+statusLabel.ZIndex = 4
+statusLabel.Parent = main
+
+local watermark = Instance.new("TextLabel")
+watermark.Size = UDim2.new(0.35, -14, 0, 14)
+watermark.Position = UDim2.new(1, -14, 1, -22)
+watermark.AnchorPoint = Vector2.new(1, 0)
+watermark.BackgroundTransparency = 1
+watermark.Text = "1ra"
+watermark.TextColor3 = Color3.new(1, 1, 1)
+watermark.TextStrokeColor3 = F_ACCENT
+watermark.TextStrokeTransparency = 0
+watermark.Font = Enum.Font.GothamBold
+watermark.TextSize = 11
+watermark.TextXAlignment = Enum.TextXAlignment.Right
+watermark.ZIndex = 4
+watermark.Parent = main
+
+local function refreshStatus()
+    if farmEnabled then
+        statusDot.BackgroundColor3 = F_ACCENT
+        statusLabel.Text = string.format("Farm: ON | Speed: %.1f", speed)
+    else
+        statusDot.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
+        statusLabel.Text = string.format("Farm: OFF | Speed: %.1f", speed)
+    end
+end
+
+local function refreshFarmBtn()
+    if farmEnabled then
+        farmToggle.Text = "FARM: ON"
+        farmToggle.BackgroundColor3 = F_BG_MID:Lerp(F_ACCENT, 0.3)
+        fts.Color = F_ACCENT; fts.Transparency = 0
+    else
+        farmToggle.Text = "FARM: OFF"
+        farmToggle.BackgroundColor3 = F_BG_MID
+        fts.Color = F_ACCENT_DK; fts.Transparency = 0.2
+    end
+end
+
+local function refreshResetCard()
+    if resetWhenFullEnabled then
+        resetCard.BackgroundColor3 = F_BG_MID:Lerp(F_ACCENT, 0.28)
+        rs.Color = F_ACCENT; rs.Transparency = 0
+        resetIndicator.BackgroundColor3 = F_ACCENT
+    else
+        resetCard.BackgroundColor3 = F_BG_MID
+        rs.Color = F_ACCENT_DK; rs.Transparency = 0.2
+        resetIndicator.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
+    end
+end
+
+farmToggle.Activated:Connect(function()
+    farmEnabled = not farmEnabled
+    refreshFarmBtn()
+    refreshStatus()
+    if farmEnabled then
+        collectedCandies = {}
+        if farmLoop then task.cancel(farmLoop) end
+        farmLoop = task.spawn(startFarming)
+    else
+        if farmLoop then task.cancel(farmLoop) end
+        farmLoop = nil
+    end
+end)
+
+resetCard.Activated:Connect(function()
+    resetWhenFullEnabled = not resetWhenFullEnabled
+    refreshResetCard()
+end)
+
+speedBox.FocusLost:Connect(function()
+    local num = tonumber(speedBox.Text)
+    if num then
+        num = math.clamp(num, 16, 22)
+        num = math.round(num * 10) / 10
+        speed = num
+        speedBox.Text = string.format("%.1f", num)
+    else
+        speedBox.Text = string.format("%.1f", speed)
+    end
+    refreshStatus()
+end)
+
+refreshFarmBtn()
+refreshResetCard()
+refreshStatus()
+
+local dragging, dragStart, startPos = false, nil, nil
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = main.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if not dragging then return end
+    if input.UserInputType == Enum.UserInputType.MouseMovement
+    or input.UserInputType == Enum.UserInputType.Touch then
+        local d = input.Position - dragStart
+        main.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + d.X,
+            startPos.Y.Scale, startPos.Y.Offset + d.Y
+        )
+    end
+end)
